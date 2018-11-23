@@ -200,7 +200,7 @@ namespace BISTickerAPI.Services
                 MidpointRounding.ToEven);
 
 
-            if (includeVolumes && mainEntry.Volume != null) usdQuote.volume = Math.Round((decimal) mainEntry.Volume.Value, 3, MidpointRounding.ToEven);
+            if (includeVolumes && mainEntry.Volume != null) usdQuote.volume = usdQuote.lastPrice * Math.Round((decimal) mainEntry.Volume.Value, 3, MidpointRounding.ToEven);
 
             quotes.Add("BTC", btcQuote);
             quotes.Add("USD", usdQuote);
