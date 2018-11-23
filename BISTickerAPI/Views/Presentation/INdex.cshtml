@@ -1,0 +1,60 @@
+﻿
+@{
+    ViewData["Title"] = "Bismuth (BIS) Price API";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>API Endpoints</h2>
+            
+            <h3>Price data</h3>
+            @{ 
+                var baseUrl = Url.ActionContext.HttpContext.Request.Scheme;
+                var apiUri = @Url.Action("GetPrice", "API", null, baseUrl);
+            }
+            <ul>
+                <li>Endpoint: /api/price</li>
+                <li>Method: GET</li>
+                <li>Description:</li>
+                <li>Example:  <a href="@apiUri" target="_blank">@apiUri</a></li>
+                <li>
+                    Sample success response:
+                        <pre style="background-color: #f7f7f9; padding: 10px"><code class="language-json" data-lang="json">{
+    "success": true,
+    "name": "Bismuth",
+    "symbol": "BIS",
+    "timestamp": 1542621911,
+    "volume24h": 23834.6571258,
+    "volumeBTC24h": 2.0466314,
+    "volumeUSD24h": 10994.503,
+    "priceChange24h": -2.26,
+    "quotes": {
+        "BTC": {
+            "askPrice": 0.00008527,
+            "bidPrice": 0.00008418,
+            "lastPrice": 0.00008418
+        },
+        "USD": {
+            "askPrice": 0.458,
+            "bidPrice": 0.452,
+            "lastPrice": 0.452
+        }
+    }
+}
+</code></pre>
+                </li>
+                <li>Note: timestamp is the time of last successful price check at exchanges API</li>
+                <li>
+                    Sample error response:
+                    <pre style="background-color: #f7f7f9; padding: 10px"><code class="language-json" data-lang="json">{
+    "success": false,
+    "message": "There is no data for this pair"
+}</code></pre>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
