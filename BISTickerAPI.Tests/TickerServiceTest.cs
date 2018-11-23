@@ -65,7 +65,7 @@ namespace BISTickerAPI.Tests
         }
 
 
-        public static ICryptopiaAPI MockCryptopiaAPI()
+        public static ICryptopiaApi MockCryptopiaAPI()
         {
 
             var mockResponseBTC = new Mock<IRestResponse>();
@@ -83,7 +83,7 @@ namespace BISTickerAPI.Tests
             return cryptopiaApi;
         }
 
-        public static QTradeAPI MockQTradeApi()
+        public static QTradeApi MockQTradeApi()
         {
             var mockResponse = new Mock<IRestResponse>();
             mockResponse.Setup(call => call.IsSuccessful).Returns(true);
@@ -96,7 +96,7 @@ namespace BISTickerAPI.Tests
             var mockQTradeRestClient = new Mock<QTradeRestClient>();
             mockQTradeRestClient.Setup(call => call.RestClient).Returns(mockRestClient.Object);
             
-            return new QTradeAPI(mockQTradeRestClient.Object);
+            return new QTradeApi(mockQTradeRestClient.Object);
         }
 
         #endregion
@@ -197,7 +197,7 @@ namespace BISTickerAPI.Tests
         {
             using (var dbContext = CreateDbContext())
             {
-                var qTradeApi = new QTradeAPI(new QTradeRestClient());
+                var qTradeApi = new QTradeApi(new QTradeRestClient());
                 var qTradeTickerService = new QTradeTickerService(dbContext, qTradeApi);
                 Assert.True(qTradeTickerService.UpdateTicker(new[] { $"{coin1}/{coin2}" }));
                 Assert.True(dbContext.TickerEntries.Any());
@@ -219,7 +219,7 @@ namespace BISTickerAPI.Tests
             var dbContext = CreateDbContext();
             var cryptopiaTicker = new CryptopiaTickerService(dbContext, MockCryptopiaAPI());
             var qTradeTicker = new QTradeTickerService(dbContext, MockQTradeApi());
-            var aggregatorService = new AggregatorService(CreateDbContext(), MockCacheService(), MockAppSettings(), null, cryptopiaTicker, qTradeTicker);
+            var aggregatorService = new AggregatorService(CreateDbContext(), MockAppSettings(), null, cryptopiaTicker, qTradeTicker);
             var coins = dbContext.GetCoins("BIS", "BTC");
             Assert.NotNull(coins.Item1);
             Assert.NotNull(coins.Item2);

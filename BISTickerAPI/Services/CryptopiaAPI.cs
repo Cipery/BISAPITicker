@@ -7,20 +7,20 @@ using System.Threading.Tasks;
 
 namespace BISTickerAPI.Services
 {
-    public class CryptopiaAPI : ICryptopiaAPI
+    public class CryptopiaAPI : ICryptopiaApi
     {
-        protected IRestClient cryptopiaClient;
+        protected IRestClient CryptopiaClient;
 
         public CryptopiaAPI(IRestClient cryptopiaClient)
         {
-            this.cryptopiaClient = cryptopiaClient;
+            this.CryptopiaClient = cryptopiaClient;
         }
 
         public CryptopiaMarkets FetchMarkets(string baseCoinSymbol)
         {
             var request = new RestRequest("GetMarkets/{baseCoinSymbol}");
             request.AddParameter("baseCoinSymbol", baseCoinSymbol, ParameterType.UrlSegment);
-            var restResponse = cryptopiaClient.Execute(request);
+            var restResponse = CryptopiaClient.Execute(request);
             if (!restResponse.IsSuccessful)
             {
                 //TODO: unknown host

@@ -10,20 +10,20 @@ using RestSharp;
 
 namespace BISTickerAPI.Services.QTrade
 {
-    public class QTradeAPI
+    public class QTradeApi
     {
-        protected IRestClient restClient;
+        protected IRestClient RestClient;
 
-        public QTradeAPI(QTradeRestClient qTradeRestClient)
+        public QTradeApi(QTradeRestClient qTradeRestClient)
         {
-            restClient = qTradeRestClient.RestClient;
+            RestClient = qTradeRestClient.RestClient;
         }
 
 
         public virtual List<QTradeTicker> FetchMarkets()
         {
             var request = new RestRequest("/tickers");
-            var restResponse = restClient.Execute(request);
+            var restResponse = RestClient.Execute(request);
 
             if (!restResponse.IsSuccessful)
             {

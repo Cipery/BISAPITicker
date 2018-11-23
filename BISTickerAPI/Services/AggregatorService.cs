@@ -16,22 +16,22 @@ namespace BISTickerAPI.Services
 {
     public class AggregatorService : IAggregatorService
     {
-        protected readonly TickerDbContext dbContext;
-        protected readonly List<ITicker> tickers = new List<ITicker>();
-        protected readonly AppSettings settings;
-        protected readonly ILogger<AggregatorService> logger;
+        protected readonly TickerDbContext DbContext;
+        protected readonly List<ITicker> Tickers = new List<ITicker>();
+        protected readonly AppSettings Settings;
+        protected readonly ILogger<AggregatorService> Logger;
 
         public AggregatorService(TickerDbContext dbContext, IOptions<AppSettings> settings,
                 ILogger<AggregatorService> logger,
                 CryptopiaTickerService cryptopiaTicker,
                 QTradeTickerService qTradeTicker)
         {
-            this.dbContext = dbContext;
-            this.settings = settings.Value;
-            this.logger = logger;
+            this.DbContext = dbContext;
+            this.Settings = settings.Value;
+            this.Logger = logger;
 
-            tickers.Add(cryptopiaTicker);
-            tickers.Add(qTradeTicker);
+            Tickers.Add(cryptopiaTicker);
+            Tickers.Add(qTradeTicker);
         }
 
         public void UpdateTickers()
@@ -39,17 +39,17 @@ namespace BISTickerAPI.Services
             // ok here is the thing, we kinda want to fetch the BTC/USDT price from.. for now only Cryptopia
             // thats why we remove the BTC/USDT pair from "all pairs".
             // so TODO: :))
-            var pairs = settings.FetchPairs.Where(p => !p.Equals("BTC/USDT")).ToArray();
-            foreach (var ticker in tickers)
+            var pairs = Settings.FetchPairs.Where(p => !p.Equals("BTC/USDT")).ToArray();
+            foreach (var ticker in Tickers)
             {
                 try
                 {
-                    ticker.UpdateTicker(ticker.GetExchangeName() == "Cryptopia" ? settings.FetchPairs : pairs);
+                    ticker.UpdateTicker(ticker.GetExchangeName() == "Cryptopia" ? Settings.FetchPairs : pairs);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
-                    logger.LogError(e, $"Problem while updating ticker {ticker.GetExchangeName()}");
+                    Logger.LogError(e, $"Problem while updating ticker {ticker.GetExchangeName()}");
                 }
             }
 
@@ -65,7 +65,7 @@ namespace BISTickerAPI.Services
         /// <returns></returns>
         public object GetAveragedOuput(string mainCoin, string baseCoin)
         {
-            var coins = dbContext.GetCoins(mainCoin, baseCoin);
+            var coins = DbContext.GetCoins(mainCoin, baseCoin);
 #region TODO
             // Why no groupby? Because .net core 2.2 doesnt translate groupby to SQL, so it does it locally.. 
             // I am afraid that it's pulling much more data from db than needed. So getting last record for each exchange is probably faster?
@@ -79,8 +79,8 @@ namespace BISTickerAPI.Services
             .OrderByDescending(t => t.Id);
             .FirstOrDefault();*/
 #endregion
-            var basePrice = dbContext.GetTickerEntry(coins.Item2, dbContext.GetCoin("USDT"));
-            var entries = dbContext.Exchanges.ToList().Select(exchange => dbContext.GetTickerEntry(coins.Item1, coins.Item2, exchange)).ToList();
+            var basePrice = DbContext.GetTickerEntry(coins.Item2, DbContext.GetCoin("USDT"));
+            var entries = DbContext.Exchanges.ToList().Select(exchange => DbContext.GetTickerEntry(coins.Item1, coins.Item2, exchange)).ToList();
 
             //remove possible null entries
             //TODO: make this in less retarded way maybe??
@@ -132,13 +132,13 @@ namespace BISTickerAPI.Services
         /// <returns></returns>
         public object GetPerExchangeOutput(string mainCoin, string baseCoin)
         {
-            var coins = dbContext.GetCoins(mainCoin, baseCoin);
-            var baseCoinTickerEntry = dbContext.GetTickerEntry(coins.Item2, dbContext.GetCoin("USDT"));
-            var exchanges = dbContext.Exchanges.ToList();
+            var coins = DbContext.GetCoins(mainCoin, baseCoin);
+            var baseCoinTickerEntry = DbContext.GetTickerEntry(coins.Item2, DbContext.GetCoin("USDT"));
+            var exchanges = DbContext.Exchanges.ToList();
             var dict = new Dictionary<string, object>();
             exchanges.ForEach(exchange =>
             {
-                var tickerEntry = dbContext.GetTickerEntry(coins.Item1, coins.Item2, exchange);
+                var tickerEntry = DbContext.GetTickerEntry(coins.Item1, coins.Item2, exchange);
                 if (tickerEntry == null)
                 {
                     return;

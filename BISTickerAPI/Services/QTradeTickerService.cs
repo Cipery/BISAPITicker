@@ -11,20 +11,20 @@ namespace BISTickerAPI.Services
 {
     public class QTradeTickerService : ITicker
     {
-        protected TickerDbContext dbContext;
-        protected QTradeAPI qTradeApi;
+        protected TickerDbContext DbContext;
+        protected QTradeApi QTradeApi;
 
-        public QTradeTickerService(TickerDbContext dbContext, QTradeAPI qTradeApi)
+        public QTradeTickerService(TickerDbContext dbContext, QTradeApi qTradeApi)
         {
-            this.dbContext = dbContext;
-            this.qTradeApi = qTradeApi;
+            DbContext = dbContext;
+            QTradeApi = qTradeApi;
         }
 
         public bool UpdateTicker(string[] currencyPairs)
         {
-            var data = qTradeApi.FetchMarkets();
-            var exchange = dbContext.Exchanges.FirstOrDefault(e => e.Name.Equals(GetExchangeName()));
-            var coins = dbContext.Coins.ToList();
+            var data = QTradeApi.FetchMarkets();
+            var exchange = DbContext.Exchanges.FirstOrDefault(e => e.Name.Equals(GetExchangeName()));
+            var coins = DbContext.Coins.ToList();
 
             foreach (var pair in currencyPairs)
             {
@@ -39,10 +39,10 @@ namespace BISTickerAPI.Services
                     throw new Exception($"Ticker for pair {pair} got some issue!");
                 }
 
-                dbContext.Add(ticker);
+                DbContext.Add(ticker);
             }
 
-            dbContext.SaveChanges();
+            DbContext.SaveChanges();
 
             return true;
         }

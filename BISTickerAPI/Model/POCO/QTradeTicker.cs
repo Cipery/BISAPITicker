@@ -30,19 +30,5 @@ namespace BISTickerAPI.Model.POCO
         public double? DayVolumeBase { get; set; }
         [JsonProperty(PropertyName = "day_volume_market")]
         public double? DayVolumeMarket { get; set; }
-        /*
-         *         "ask": "0.0369",
-        "bid": "0.02652",
-        "day_avg_price": "0.0303804603595631",
-        "day_change": "-0.1503540191586839",
-        "day_high": "0.03635",
-        "day_low": "0.02652",
-        "day_open": "0.031213",
-        "day_volume_base": "1.32774829",
-        "day_volume_market": "43.70402141",
-        "id": 15,
-        "id_hr": "VEO_BTC",
-        "last": "0.02652"
-         */
     }
 }

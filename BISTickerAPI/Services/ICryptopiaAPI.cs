@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BISTickerAPI.Services
 {
-    public interface ICryptopiaAPI
+    public interface ICryptopiaApi
     {
         CryptopiaMarkets FetchMarkets(string baseCoinSymbol);
     }

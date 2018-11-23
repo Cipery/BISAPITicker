@@ -12,18 +12,19 @@ using Newtonsoft.Json.Linq;
 namespace BISTickerAPI.Controllers
 {
     [Route("api/")]
-    public class APIController : Controller
+    public class ApiController : Controller
     {
         protected MemoryCachingAggregatorService AggregatorService;
 
-        public APIController(MemoryCachingAggregatorService aggregatorService)
+        public ApiController(MemoryCachingAggregatorService aggregatorService)
         {
-            this.AggregatorService = aggregatorService;
+            AggregatorService = aggregatorService;
         }
 
         // TODO: There should be some in-memory cache with available coin keys (maybe just cache coins entities)
         // because people could just brute spam with random coin symbols, and since each request will hit database
-        // it might (and it WILL) kill the db server (DOS/DDOS)
+        // 
+        // Note: There should never be any uncached endpoint. 
 
         // GET: api/price
         [HttpGet("price/{mainCoin?}/{baseCoin?}")]

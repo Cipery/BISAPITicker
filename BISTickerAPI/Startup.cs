@@ -51,8 +51,8 @@ namespace BISTickerAPI
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.Configure<AppSettings>(Configuration);
             services.AddScoped<IRestClient>(s => new RestClient("https://www.cryptopia.co.nz/api"));
-            services.AddScoped<ICryptopiaAPI, CryptopiaAPI>();
-            services.AddScoped<QTradeAPI>();
+            services.AddScoped<ICryptopiaApi, CryptopiaAPI>();
+            services.AddScoped<QTradeApi>();
             services.AddSingleton<QTradeRestClient>();
             services.AddScoped<QTradeTickerService>();
             services.AddScoped<CryptopiaTickerService>();

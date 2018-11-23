@@ -13,7 +13,7 @@
                 <h3>Price data</h3>
                 @{ 
                     var baseUrl = Url.ActionContext.HttpContext.Request.Scheme;
-                    var apiUri = @Url.Action("GetPrice", "API", null, baseUrl);
+                    var apiUri = @Url.Action("GetPrice", "Api", null, baseUrl);
                 }
                 <ul>
                     <li>Endpoint: /api/price</li>
@@ -61,7 +61,7 @@
                 <h3>Markets (exchanges) data</h3>
                 @{ 
                     baseUrl = Url.ActionContext.HttpContext.Request.Scheme;
-                    apiUri = @Url.Action("GetMarkets", "API", null, baseUrl);
+                    apiUri = @Url.Action("GetMarkets", "Api", null, baseUrl);
                 }
                 <ul>
                     <li>Endpoint: /api/markets</li>

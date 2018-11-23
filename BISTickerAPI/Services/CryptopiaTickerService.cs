@@ -17,13 +17,13 @@ namespace BISTickerAPI.Services
 {
     public class CryptopiaTickerService : ITicker
     {
-        protected TickerDbContext dbContext;
-        protected ICryptopiaAPI cryptopiaAPI;
+        protected TickerDbContext DbContext;
+        protected ICryptopiaApi CryptopiaApi;
 
-        public CryptopiaTickerService(TickerDbContext dbContext, ICryptopiaAPI cryptopiaAPI)
+        public CryptopiaTickerService(TickerDbContext dbContext, ICryptopiaApi cryptopiaAPI)
         {
-            this.dbContext = dbContext;
-            this.cryptopiaAPI = cryptopiaAPI;
+            this.DbContext = dbContext;
+            this.CryptopiaApi = cryptopiaAPI;
         }
 
         public bool UpdateTicker(string[] currencyPairs)
@@ -38,10 +38,10 @@ namespace BISTickerAPI.Services
                     throw new Exception($"Ticker for pair {pair} got some issue!");
                 }
 
-                dbContext.Add(ticker);
+                DbContext.Add(ticker);
             }
 
-            dbContext.SaveChanges();
+            DbContext.SaveChanges();
 
             return true;
         }
@@ -53,9 +53,9 @@ namespace BISTickerAPI.Services
 
         public TickerEntry FetchTickerData(string leftCoin, string rightCoin)
         {
-            var cryptopiaMarkets = cryptopiaAPI.FetchMarkets(rightCoin);
-            var coins = dbContext.Coins;
-            var exchange = dbContext.Exchanges.Single(exch => exch.Name.Equals(GetExchangeName()));
+            var cryptopiaMarkets = CryptopiaApi.FetchMarkets(rightCoin);
+            var coins = DbContext.Coins;
+            var exchange = DbContext.Exchanges.Single(exch => exch.Name.Equals(GetExchangeName()));
             // JSON convert fills almost all data needed. However, we still need to fill some stuff
             cryptopiaMarkets.Data.ForEach(p =>
             {
@@ -72,8 +72,8 @@ namespace BISTickerAPI.Services
 
         public (Coin, Coin) GetCoins(string leftCoin, string rightCoin)
         {
-            var coin = dbContext.Coins.Single(c => c.Symbol == leftCoin);
-            var baseCoin = dbContext.Coins.Single(c => c.Symbol == rightCoin);
+            var coin = DbContext.Coins.Single(c => c.Symbol == leftCoin);
+            var baseCoin = DbContext.Coins.Single(c => c.Symbol == rightCoin);
             return (coin, baseCoin);
         }
     }
