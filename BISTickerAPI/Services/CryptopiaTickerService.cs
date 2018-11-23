@@ -51,33 +51,6 @@ namespace BISTickerAPI.Services
             return "Cryptopia";
         }
 
-        public object GetCoinInfo(string leftCoin, string rightCoin)
-        {
-            return null;
-        }
-
-        /*public object GetCoinInfoJsonCached(string leftCoin, string rightCoin)
-        {
-            var cached = cacheService.GetCachedObject(GenerateCacheKeyForPair(leftCoin, rightCoin));
-
-            if (cached != null)
-            {
-                return cached;
-            }
-
-            cached = GetCoinInfo(leftCoin, rightCoin);
-
-            if (cached == null)
-            {
-                return null;
-            }
-
-            cached = JsonConvert.SerializeObject(cached, Formatting.Indented);
-            cacheService.AddCachedObject(GenerateCacheKeyForPair(leftCoin, rightCoin), cached);
-
-            return cached;
-        }*/
-
         public TickerEntry FetchTickerData(string leftCoin, string rightCoin)
         {
             var cryptopiaMarkets = cryptopiaAPI.FetchMarkets(rightCoin);

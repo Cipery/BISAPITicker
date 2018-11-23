@@ -59,6 +59,8 @@ namespace BISTickerAPI
             services.AddMemoryCache();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<AggregatorService>();
+            services.AddScoped<MemoryCachingAggregatorService>();
+            services.AddSingleton<CacheService>();
             services.AddHangfire(configuration => {
                 configuration.UseStorage(new Hangfire.MemoryStorage.MemoryStorage());
             });
@@ -110,7 +112,7 @@ namespace BISTickerAPI
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                 .CreateScope())
             {
-                var aggregator = serviceScope.ServiceProvider.GetService<AggregatorService>();
+                var aggregator = serviceScope.ServiceProvider.GetService<MemoryCachingAggregatorService>();
 #pragma warning disable CS0618 // Type or member is obsolete
                 RecurringJob.AddOrUpdate(() => aggregator.UpdateTickers(), Cron.MinuteInterval(5));
                 BackgroundJob.Schedule(() => aggregator.UpdateTickers(), TimeSpan.FromSeconds(10));

@@ -14,21 +14,19 @@ using Newtonsoft.Json;
 
 namespace BISTickerAPI.Services
 {
-    public class AggregatorService
+    public class AggregatorService : IAggregatorService
     {
         protected readonly TickerDbContext dbContext;
-        protected readonly ICacheService memoryCache;
         protected readonly List<ITicker> tickers = new List<ITicker>();
         protected readonly AppSettings settings;
         protected readonly ILogger<AggregatorService> logger;
 
-        public AggregatorService(TickerDbContext dbContext, ICacheService memoryCache, IOptions<AppSettings> settings,
-            ILogger<AggregatorService> logger,
-            CryptopiaTickerService cryptopiaTicker,
-            QTradeTickerService qTradeTicker)
+        public AggregatorService(TickerDbContext dbContext, IOptions<AppSettings> settings,
+                ILogger<AggregatorService> logger,
+                CryptopiaTickerService cryptopiaTicker,
+                QTradeTickerService qTradeTicker)
         {
             this.dbContext = dbContext;
-            this.memoryCache = memoryCache;
             this.settings = settings.Value;
             this.logger = logger;
 
@@ -67,7 +65,7 @@ namespace BISTickerAPI.Services
         /// <returns></returns>
         public object GetAveragedOuput(string mainCoin, string baseCoin)
         {
-            var coins = GetCoins(mainCoin, baseCoin);
+            var coins = dbContext.GetCoins(mainCoin, baseCoin);
 #region TODO
             // Why no groupby? Because .net core 2.2 doesnt translate groupby to SQL, so it does it locally.. 
             // I am afraid that it's pulling much more data from db than needed. So getting last record for each exchange is probably faster?
@@ -81,8 +79,8 @@ namespace BISTickerAPI.Services
             .OrderByDescending(t => t.Id);
             .FirstOrDefault();*/
 #endregion
-            var basePrice = GetTickerEntry(coins.Item2, GetCoin("USDT"));
-            var entries = dbContext.Exchanges.ToList().Select(exchange => GetTickerEntry(coins.Item1, coins.Item2, exchange)).ToList();
+            var basePrice = dbContext.GetTickerEntry(coins.Item2, dbContext.GetCoin("USDT"));
+            var entries = dbContext.Exchanges.ToList().Select(exchange => dbContext.GetTickerEntry(coins.Item1, coins.Item2, exchange)).ToList();
 
             //remove possible null entries
             //TODO: make this in less retarded way maybe??
@@ -134,13 +132,13 @@ namespace BISTickerAPI.Services
         /// <returns></returns>
         public object GetPerExchangeOutput(string mainCoin, string baseCoin)
         {
-            var coins = GetCoins(mainCoin, baseCoin);
-            var baseCoinTickerEntry = GetTickerEntry(coins.Item2, GetCoin("USDT"));
+            var coins = dbContext.GetCoins(mainCoin, baseCoin);
+            var baseCoinTickerEntry = dbContext.GetTickerEntry(coins.Item2, dbContext.GetCoin("USDT"));
             var exchanges = dbContext.Exchanges.ToList();
             var dict = new Dictionary<string, object>();
             exchanges.ForEach(exchange =>
             {
-                var tickerEntry = GetTickerEntry(coins.Item1, coins.Item2, exchange);
+                var tickerEntry = dbContext.GetTickerEntry(coins.Item1, coins.Item2, exchange);
                 if (tickerEntry == null)
                 {
                     return;
@@ -226,50 +224,6 @@ namespace BISTickerAPI.Services
                 MidpointRounding.ToEven);
             headerObject.priceChange24h = mainEntry.Change;
             return headerObject;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="coin"></param>
-        /// <param name="baseCoin"></param>
-        /// <returns></returns>
-        public TickerEntry GetTickerEntry(Coin coin, Coin baseCoin)
-        {
-            return dbContext.TickerEntries.Where(t => t.PairCoin1 == coin && t.PairCoin2 == baseCoin)
-                .OrderByDescending(t => t.Id)
-                .FirstOrDefault();
-        }
-
-        public TickerEntry GetTickerEntry(Coin coin, Coin baseCoin, Exchange exchange)
-        {
-            return dbContext.TickerEntries.Where(t => t.PairCoin1 == coin && t.PairCoin2 == baseCoin && t.Exchange == exchange)
-                .OrderByDescending(t => t.Id)
-                .FirstOrDefault();
-        }
-
-        public Coin GetCoin(string coinSymbol)
-        {
-            var coin = dbContext.Coins.SingleOrDefault(c => c.Symbol == coinSymbol);
-            if (coin == null)
-            {
-                throw new CoinNotFoundException {CoinSymbol = coinSymbol};
-            }
-
-            return coin;
-        }
-
-        public (Coin, Coin) GetCoins(string leftCoin, string rightCoin)
-        {
-            var coin = GetCoin(leftCoin);
-            var baseCoin = GetCoin(rightCoin);
-
-            return (coin, baseCoin);
-        }
-
-        public string GenerateCacheKeyForPair(string coin1, string coin2)
-        {
-            return $"{CacheKeys.TickerResult}-{coin1}-{coin2}";
         }
     }
 }

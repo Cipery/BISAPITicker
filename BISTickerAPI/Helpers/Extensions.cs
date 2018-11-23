@@ -17,5 +17,10 @@ namespace BISTickerAPI.Helpers
         {
             return tuple != null && tuple.Item1 != null && tuple.Item2 != null;
         }
+
+        public static string[] SplitSlashedPair(this string pair)
+        {
+            return pair.Split('/');
+        }
     }
 }

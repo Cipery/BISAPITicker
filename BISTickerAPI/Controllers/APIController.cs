@@ -14,9 +14,9 @@ namespace BISTickerAPI.Controllers
     [Route("api/")]
     public class APIController : Controller
     {
-        protected AggregatorService AggregatorService;
+        protected MemoryCachingAggregatorService AggregatorService;
 
-        public APIController(AggregatorService aggregatorService)
+        public APIController(MemoryCachingAggregatorService aggregatorService)
         {
             this.AggregatorService = aggregatorService;
         }

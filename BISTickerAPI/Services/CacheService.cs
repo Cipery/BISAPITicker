@@ -23,7 +23,7 @@ namespace BISTickerAPI.Services
 
         public void RemoveCachedObject(object key)
         {
-            //Console.WriteLine($"Getting key: {key} from cache");
+            //Console.WriteLine($"Removing key: {key} from cache");
             _cache.Remove(key);
         }
 
@@ -32,11 +32,18 @@ namespace BISTickerAPI.Services
             //Console.WriteLine($"Putting stuff into cache, key: {key}, value: {value}");
             _cache.Set(key, value);
         }
+
+        public static string GenerateCacheKeyForPair(string baseKey, string coin1, string coin2)
+        {
+            return $"{baseKey}-{coin1}-{coin2}";
+        }
     }
 
     public static class CacheKeys
     {
         public static string TickerResult { get { return "ticker-result"; } }
+        public static string MarketsResult { get { return "markets-result"; } }
         public static string Visits { get { return "visits"; } }
+        public static string PairsMap => "currency_pairs";
     }
 }

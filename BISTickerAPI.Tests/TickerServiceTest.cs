@@ -220,7 +220,7 @@ namespace BISTickerAPI.Tests
             var cryptopiaTicker = new CryptopiaTickerService(dbContext, MockCryptopiaAPI());
             var qTradeTicker = new QTradeTickerService(dbContext, MockQTradeApi());
             var aggregatorService = new AggregatorService(CreateDbContext(), MockCacheService(), MockAppSettings(), null, cryptopiaTicker, qTradeTicker);
-            var coins = aggregatorService.GetCoins("BIS", "BTC");
+            var coins = dbContext.GetCoins("BIS", "BTC");
             Assert.NotNull(coins.Item1);
             Assert.NotNull(coins.Item2);
             Assert.Equal("BIS", coins.Item1.Symbol);
