@@ -8,19 +8,20 @@
     <div class="row">
         <div class="col-md-12">
             <h2>API Endpoints</h2>
-            
-            <h3>Price data</h3>
-            @{ 
-                var baseUrl = Url.ActionContext.HttpContext.Request.Scheme;
-                var apiUri = @Url.Action("GetPrice", "API", null, baseUrl);
-            }
-            <ul>
-                <li>Endpoint: /api/price</li>
-                <li>Method: GET</li>
-                <li>Description:</li>
-                <li>Example:  <a href="@apiUri" target="_blank">@apiUri</a></li>
-                <li>
-                    Sample success response:
+
+            <div>
+                <h3>Price data</h3>
+                @{ 
+                    var baseUrl = Url.ActionContext.HttpContext.Request.Scheme;
+                    var apiUri = @Url.Action("GetPrice", "API", null, baseUrl);
+                }
+                <ul>
+                    <li>Endpoint: /api/price</li>
+                    <li>Method: GET</li>
+                    <li>Description:</li>
+                    <li>Example:  <a href="@apiUri" target="_blank">@apiUri</a></li>
+                    <li>
+                        Sample success response:
                         <pre style="background-color: #f7f7f9; padding: 10px"><code class="language-json" data-lang="json">{
     "success": true,
     "name": "Bismuth",
@@ -44,16 +45,82 @@
     }
 }
 </code></pre>
-                </li>
-                <li>Note: timestamp is the time of last successful price check at exchanges API</li>
-                <li>
-                    Sample error response:
-                    <pre style="background-color: #f7f7f9; padding: 10px"><code class="language-json" data-lang="json">{
+                    </li>
+                    <li>Note: timestamp is the time of last successful price check at exchanges API</li>
+                    <li>
+                        Sample error response:
+                        <pre style="background-color: #f7f7f9; padding: 10px"><code class="language-json" data-lang="json">{
     "success": false,
     "message": "There is no data for this pair"
 }</code></pre>
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3>Markets (exchanges) data</h3>
+                @{ 
+                    baseUrl = Url.ActionContext.HttpContext.Request.Scheme;
+                    apiUri = @Url.Action("GetMarkets", "API", null, baseUrl);
+                }
+                <ul>
+                    <li>Endpoint: /api/markets</li>
+                    <li>Method: GET</li>
+                    <li>Description:</li>
+                    <li>Example:  <a href="@apiUri" target="_blank">@apiUri</a></li>
+                    <li>
+                        Sample success response:
+                        <pre style="background-color: #f7f7f9; padding: 10px"><code class="language-json" data-lang="json">{
+  "success": true,
+  "name": "Bismuth",
+  "symbol": "BIS",
+  "markets": {
+    "Cryptopia": {
+      "timestamp": 1542974907,
+      "volume": 24226.14700595,
+      "BTC": {
+        "askPrice": 0.0000799,
+        "bidPrice": 0.00007896,
+        "lastPrice": 0.0000796,
+        "volume": 1.90982874
+      },
+      "USD": {
+        "askPrice": 0.350,
+        "bidPrice": 0.346,
+        "lastPrice": 0.349,
+        "volume": 8454.925303
+      }
+    },
+    "QTrade": {
+      "timestamp": 1542974921,
+      "volume": 1724.493371,
+      "BTC": {
+        "askPrice": 0.000081,
+        "bidPrice": 0.00008,
+        "lastPrice": 0.000081,
+        "volume": 0.13079392
+      },
+      "USD": {
+        "askPrice": 0.355,
+        "bidPrice": 0.351,
+        "lastPrice": 0.355,
+        "volume": 612.195015
+      }
+    }
+  }
+}
+</code></pre>
+                    </li>
+                    <li>Note: timestamp is the time of last successful price check at exchanges API</li>
+                    <li>
+                        Sample error response:
+                        <pre style="background-color: #f7f7f9; padding: 10px"><code class="language-json" data-lang="json">{
+    "success": false,
+    "message": "There is no data for this pair"
+}</code></pre>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
