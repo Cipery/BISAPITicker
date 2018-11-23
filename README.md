@@ -1,5 +1,5 @@
-# BISAPITicker
-A ticker API for BISmuth cryptoccurency 
+# Bismuth coin ticker API
+A ticker API for BISmuth cryptocurrency 
 
 Running @ https://bismuth.ciperyho.eu
 
