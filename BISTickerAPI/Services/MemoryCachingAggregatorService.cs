@@ -68,7 +68,7 @@ namespace BISTickerAPI.Services
             {
                 var pairSplit = appSettingsFetchPair.SplitSlashedPair();
                 CacheService.RemoveCachedObject(CacheService.GenerateCacheKeyForPair(CacheKeys.TickerResult, pairSplit[0], pairSplit[1]));
-                CacheService.RemoveCachedObject(CacheService.GenerateCacheKeyForPair(CacheKeys.PairsMap, pairSplit[0], pairSplit[1]));
+                CacheService.RemoveCachedObject(CacheService.GenerateCacheKeyForPair(CacheKeys.MarketsResult, pairSplit[0], pairSplit[1]));
             }
         }
     }
