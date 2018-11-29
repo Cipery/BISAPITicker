@@ -36,7 +36,9 @@ namespace BISTickerAPI.Services
 
                 if (ticker == null)
                 {
+#if DEBUG
                     Console.WriteLine($"QTrade ticker does not have pair {pair}.");
+#endif
                     continue;
                     //throw new Exception($"Ticker for pair {pair} got some issue!");
                 }

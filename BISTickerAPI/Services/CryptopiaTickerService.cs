@@ -35,7 +35,9 @@ namespace BISTickerAPI.Services
 
                 if(ticker == null)
                 {
+#if DEBUG
                     Console.WriteLine($"Cryptopia ticker does not have pair {pair}.");
+#endif
                     continue;
                     //throw new Exception($"Ticker for pair {pair} got some issue!");
                 }

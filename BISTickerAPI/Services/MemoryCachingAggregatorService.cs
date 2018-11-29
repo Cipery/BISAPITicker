@@ -42,7 +42,9 @@ namespace BISTickerAPI.Services
             }
             else
             {
+#if DEBUG
                 Console.WriteLine("Cache hit!");
+#endif
             }
 
             return cacheObject;
@@ -61,6 +63,12 @@ namespace BISTickerAPI.Services
                 {
                     CacheService.AddCachedObject(key, cacheObject);
                 }
+            }
+            else
+            {
+#if DEBUG
+                Console.WriteLine("Cache hit!");
+#endif
             }
 
             return cacheObject;
