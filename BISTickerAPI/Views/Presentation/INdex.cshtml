@@ -132,7 +132,7 @@
                             @foreach (var pair in appSettings.Value.FetchPairs)
                             {
                                 var split = pair.Split('/');
-                                var link = Url.Action("GetPrice", "Api", new { mainCoin = split[0], baseCoin = split[1] }, baseUrl);
+                                var link = Url.Action("GetMarkets", "Api", new { mainCoin = split[0], baseCoin = split[1] }, baseUrl);
                                 <li><a href="@link" target="_blank">@link</a></li>
                             }
                         </ul>
