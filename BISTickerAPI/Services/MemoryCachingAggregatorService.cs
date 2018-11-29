@@ -15,11 +15,11 @@ namespace BISTickerAPI.Services
     /// </summary>
     public class MemoryCachingAggregatorService : IAggregatorService
     {
-        protected AggregatorService AggregatorService;
+        protected AntiDbDoSAggregatorService AggregatorService;
         protected CacheService CacheService;
         protected AppSettings AppSettings;
 
-        public MemoryCachingAggregatorService(CacheService cacheService, AggregatorService aggregatorService, IOptions<AppSettings> settings)
+        public MemoryCachingAggregatorService(CacheService cacheService, AntiDbDoSAggregatorService aggregatorService, IOptions<AppSettings> settings)
         {
             AggregatorService = aggregatorService;
             CacheService = cacheService;
@@ -34,7 +34,11 @@ namespace BISTickerAPI.Services
             if (cacheObject == null)
             {
                 cacheObject = AggregatorService.GetAveragedOuput(mainCoin, baseCoin);
-                CacheService.AddCachedObject(key, cacheObject);
+                // We do NOT store anything in memory cache for unknown coins!
+                if (cacheObject != AntiDbDoSAggregatorService.ErrorResponse)
+                {
+                    CacheService.AddCachedObject(key, cacheObject);
+                }
             }
             else
             {
@@ -52,7 +56,11 @@ namespace BISTickerAPI.Services
             if (cacheObject == null)
             {
                 cacheObject = AggregatorService.GetPerExchangeOutput(mainCoin, baseCoin);
-                CacheService.AddCachedObject(key, cacheObject);
+                // We do NOT store anything in memory cache for unknown coins!
+                if (cacheObject != AntiDbDoSAggregatorService.ErrorResponse)
+                {
+                    CacheService.AddCachedObject(key, cacheObject);
+                }
             }
 
             return cacheObject;

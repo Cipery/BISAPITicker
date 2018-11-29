@@ -22,6 +22,7 @@ namespace BISTickerAPI.Controllers
         }
 
         // TODO: There should be some in-memory cache with available coin keys (maybe just cache coins entities)
+        // Edit: Should be fixed by 29.11.2018 commits - AntiDbDoSAggregatorService
         // because people could just brute spam with random coin symbols, and since each request will hit database
         // 
         // Note: There should never be any uncached endpoint. 
@@ -31,10 +32,7 @@ namespace BISTickerAPI.Controllers
         [Produces("application/json")]
         public ContentResult GetPrice(string mainCoin = "BIS", string baseCoin = "BTC")
         {
-            Console.WriteLine("Api has been accessed");
-            var result = AggregatorService.GetAveragedOuput(mainCoin, baseCoin);
-            //AggregatorService.Uda
-            return Content((string)result);
+            return Content((string)AggregatorService.GetAveragedOuput(mainCoin, baseCoin));
         }
 
         // GET: api/price
@@ -42,8 +40,7 @@ namespace BISTickerAPI.Controllers
         [Produces("application/json")]
         public ContentResult GetMarkets(string mainCoin = "BIS", string baseCoin = "BTC")
         {
-            var result = AggregatorService.GetPerExchangeOutput(mainCoin, baseCoin);
-            return Content((string) result);
+            return Content((string)AggregatorService.GetPerExchangeOutput(mainCoin, baseCoin));
         }
 
         // GET: api/test

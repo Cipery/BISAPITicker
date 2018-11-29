@@ -1,4 +1,6 @@
-﻿
+﻿@using BISTickerAPI.Helpers
+@using Microsoft.Extensions.Options
+@inject IOptions<AppSettings> appSettings
 @{
     ViewData["Title"] = "Bismuth (BIS) Price API";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -53,6 +55,17 @@
     "success": false,
     "message": "There is no data for this pair"
 }</code></pre>
+                    </li>
+                    <li>List of endpoints that are available:
+                        <ul>
+                            <li><a href="@apiUri" target="_blank">@apiUri</a></li>
+                            @foreach (var pair in appSettings.Value.FetchPairs)
+                            {
+                                var split = pair.Split('/');
+                                var link = Url.Action("GetPrice", "Api", new { mainCoin = split[0], baseCoin = split[1] }, baseUrl);
+                                <li><a href="@link" target="_blank">@link</a></li>
+                            }
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -112,6 +125,18 @@
 </code></pre>
                     </li>
                     <li>Note: timestamp is the time of last successful price check at exchanges API</li>
+                    <li>
+                        List of endpoints that are available:
+                        <ul>
+                            <li><a href="@apiUri" target="_blank">@apiUri</a></li>
+                            @foreach (var pair in appSettings.Value.FetchPairs)
+                            {
+                                var split = pair.Split('/');
+                                var link = Url.Action("GetPrice", "Api", new { mainCoin = split[0], baseCoin = split[1] }, baseUrl);
+                                <li><a href="@link" target="_blank">@link</a></li>
+                            }
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>

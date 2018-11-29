@@ -60,6 +60,7 @@ namespace BISTickerAPI
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<AggregatorService>();
             services.AddScoped<MemoryCachingAggregatorService>();
+            services.AddScoped<AntiDbDoSAggregatorService>();
             services.AddSingleton<CacheService>();
             services.AddHangfire(configuration => {
                 configuration.UseStorage(new Hangfire.MemoryStorage.MemoryStorage());
@@ -92,10 +93,11 @@ namespace BISTickerAPI
             {
                 Console.WriteLine("Migrating database");
                 var dbContext = serviceScope.ServiceProvider.GetService<TickerDbContext>();
+                var appSettings = serviceScope.ServiceProvider.GetService<IOptions<AppSettings>>();
                 //dbContext.Database.EnsureDeleted();
                 //dbContext.Database.EnsureCreated();
                 dbContext.Database.Migrate();
-                SeedData.Initialize(dbContext);
+                SeedData.Initialize(dbContext, appSettings.Value.Coins);
                 Console.WriteLine("Migrated database");
             }
 
@@ -115,7 +117,9 @@ namespace BISTickerAPI
                 var aggregator = serviceScope.ServiceProvider.GetService<MemoryCachingAggregatorService>();
 #pragma warning disable CS0618 // Type or member is obsolete
                 RecurringJob.AddOrUpdate(() => aggregator.UpdateTickers(), Cron.MinuteInterval(5));
-                //BackgroundJob.Schedule(() => aggregator.UpdateTickers(), TimeSpan.FromSeconds(10));
+#if DEBUG
+                BackgroundJob.Schedule(() => aggregator.UpdateTickers(), TimeSpan.FromSeconds(10));
+#endif
 #pragma warning restore CS0618 // Type or member is obsolete
             }
         }

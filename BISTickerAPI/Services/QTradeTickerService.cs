@@ -36,7 +36,9 @@ namespace BISTickerAPI.Services
 
                 if (ticker == null)
                 {
-                    throw new Exception($"Ticker for pair {pair} got some issue!");
+                    Console.WriteLine($"QTrade ticker does not have pair {pair}.");
+                    continue;
+                    //throw new Exception($"Ticker for pair {pair} got some issue!");
                 }
 
                 DbContext.Add(ticker);

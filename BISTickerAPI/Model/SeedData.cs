@@ -8,17 +8,13 @@ namespace BISTickerAPI.Model
 {
     public class SeedData
     {
-        public static void Initialize(TickerDbContext dbContext)
+        public static void Initialize(TickerDbContext dbContext, Coin[] coins)
         {
-            if(!dbContext.Coins.Any())
+            foreach (var coin1 in coins.Where(p => !dbContext.Coins.Any(coin => coin.Symbol.Equals(p.Symbol))))
             {
-                dbContext.Add(new Coin() { Name = "Bismuth", Symbol = "BIS" });
-                dbContext.Add(new Coin() { Name = "Bitcoin", Symbol = "BTC" });
-                dbContext.Add(new Coin() { Name = "Litecoin", Symbol = "LTC" });
-                dbContext.Add(new Coin() { Name = "Dogecoin", Symbol = "DOGE" });
-                dbContext.Add(new Coin() { Name = "USDTether", Symbol = "USDT" });
+                dbContext.Coins.Add(coin1);
             }
-
+            
             if(!dbContext.Exchanges.Any(exc => exc.Name.Equals("Cryptopia")))
             {
                 dbContext.Add(new Exchange() { Name = "Cryptopia"});

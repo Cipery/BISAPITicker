@@ -35,7 +35,9 @@ namespace BISTickerAPI.Services
 
                 if(ticker == null)
                 {
-                    throw new Exception($"Ticker for pair {pair} got some issue!");
+                    Console.WriteLine($"Cryptopia ticker does not have pair {pair}.");
+                    continue;
+                    //throw new Exception($"Ticker for pair {pair} got some issue!");
                 }
 
                 DbContext.Add(ticker);
@@ -54,7 +56,7 @@ namespace BISTickerAPI.Services
         public TickerEntry FetchTickerData(string leftCoin, string rightCoin)
         {
             var cryptopiaMarkets = CryptopiaApi.FetchMarkets(rightCoin);
-            var coins = DbContext.Coins;
+            var coins = DbContext.Coins.ToList();
             var exchange = DbContext.Exchanges.Single(exch => exch.Name.Equals(GetExchangeName()));
             // JSON convert fills almost all data needed. However, we still need to fill some stuff
             cryptopiaMarkets.Data.ForEach(p =>

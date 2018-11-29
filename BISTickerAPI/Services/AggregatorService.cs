@@ -179,28 +179,34 @@ namespace BISTickerAPI.Services
         {
             // Why all the decimals? Cause current MYSQL provider (POMELO) doesnt allow for decimal(24,8) types
             var quotes = new Dictionary<string, object>();
-            dynamic btcQuote = new ExpandoObject();
-            btcQuote.askPrice = (decimal) mainEntry.AskPrice;
-            btcQuote.bidPrice = (decimal) mainEntry.BidPrice;
-            btcQuote.lastPrice = (decimal) mainEntry.LastPrice;
-            if (includeVolumes && mainEntry.BaseVolume != null) btcQuote.volume = (decimal) mainEntry.BaseVolume.Value;
-            if (includeTimestamp)
+            // There are some weird 'ifs' in this code, because the main pair is BTC/USDT
+            // TODO: Think of a better/cleaner way how to do this
+            if (!mainEntry.PairCoin1.Symbol.Equals("BTC"))
             {
-                btcQuote.timestamp = new DateTimeOffset(mainEntry.Timestamp).ToUnixTimeSeconds();
+                dynamic btcQuote = new ExpandoObject();
+                btcQuote.askPrice = (decimal) mainEntry.AskPrice;
+                btcQuote.bidPrice = (decimal) mainEntry.BidPrice;
+                btcQuote.lastPrice = (decimal) mainEntry.LastPrice;
+                if (includeVolumes && mainEntry.BaseVolume != null)
+                    btcQuote.volume = (decimal) mainEntry.BaseVolume.Value;
+                if (includeTimestamp)
+                {
+                    btcQuote.timestamp = new DateTimeOffset(mainEntry.Timestamp).ToUnixTimeSeconds();
+                }
+
+                quotes.Add("BTC", btcQuote);
             }
 
             dynamic usdQuote = new ExpandoObject();
-            usdQuote.askPrice = Math.Round((decimal) mainEntry.AskPrice * (decimal) baseCoinEntry.LastPrice, 3,
+            usdQuote.askPrice = Math.Round((decimal) mainEntry.AskPrice * (decimal) (baseCoinEntry?.LastPrice ?? 1.0), 3,
                 MidpointRounding.ToEven);
-            usdQuote.bidPrice = Math.Round((decimal) mainEntry.BidPrice * (decimal) baseCoinEntry.LastPrice, 3,
+            usdQuote.bidPrice = Math.Round((decimal) mainEntry.BidPrice * (decimal)(baseCoinEntry?.LastPrice ?? 1.0), 3,
                 MidpointRounding.ToEven);
-            usdQuote.lastPrice = Math.Round((decimal) mainEntry.LastPrice * (decimal) baseCoinEntry.LastPrice, 3,
+            usdQuote.lastPrice = Math.Round((decimal) mainEntry.LastPrice * (decimal)(baseCoinEntry?.LastPrice ?? 1.0), 3,
                 MidpointRounding.ToEven);
 
 
             if (includeVolumes && mainEntry.Volume != null) usdQuote.volume = usdQuote.lastPrice * Math.Round((decimal) mainEntry.Volume.Value, 3, MidpointRounding.ToEven);
-
-            quotes.Add("BTC", btcQuote);
             quotes.Add("USD", usdQuote);
             return quotes;
         }
@@ -219,8 +225,8 @@ namespace BISTickerAPI.Services
             headerObject.symbol = mainEntry.PairCoin1.Symbol;
             headerObject.timestamp = new DateTimeOffset(mainEntry.Timestamp).ToUnixTimeSeconds();
             headerObject.volume24h = mainEntry.Volume;
-            headerObject.volumeBTC24h = mainEntry.BaseVolume;
-            headerObject.volumeUSD24h = Math.Round(mainEntry.BaseVolume.Value * baseCoinEntry.LastPrice, 3,
+            headerObject.volumeBTC24h = mainEntry.PairCoin1.Symbol.Equals("BTC") ? mainEntry.Volume : mainEntry.BaseVolume;
+            headerObject.volumeUSD24h = Math.Round(mainEntry.BaseVolume.Value * (baseCoinEntry?.LastPrice ?? 1), 3,
                 MidpointRounding.ToEven);
             headerObject.priceChange24h = mainEntry.Change;
             return headerObject;

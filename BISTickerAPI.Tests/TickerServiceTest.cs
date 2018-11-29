@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using RestSharp;
 using System;
+using System.Collections.Generic;
 using Xunit;
 using System.Linq;
 using System.IO;
+using BISTickerAPI.Entities;
 using BISTickerAPI.Helpers;
 using BISTickerAPI.Services.QTrade;
 using Microsoft.Extensions.Caching.Memory;
@@ -53,7 +55,18 @@ namespace BISTickerAPI.Tests
             {
                 //dbContext.Database.Migrate();
             }
-            SeedData.Initialize(dbContext);
+
+            var coinsList = new List<Coin>
+            {
+                new Coin() { Name = "Bismuth", Symbol = "BIS" },
+                new Coin() { Name = "Bitcoin", Symbol = "BTC" },
+                new Coin() { Name = "Litecoin", Symbol = "LTC" },
+                new Coin() { Name = "Dogecoin", Symbol = "DOGE" },
+                new Coin() { Name = "USDTether", Symbol = "USDT" },
+                new Coin() { Name = "ZCash", Symbol = "ZEC" },
+                new Coin() { Name = "Ethereum", Symbol = "ETH" }
+            };
+            SeedData.Initialize(dbContext, coinsList.ToArray());
             return dbContext;
         }
 
