@@ -25,6 +25,11 @@ namespace BISTickerAPI.Model
                 dbContext.Add(new Exchange() { Name = "QTrade" });
             }
 
+            if (!dbContext.Exchanges.Any(exc => exc.Name.Equals("TradeSatoshi")))
+            {
+                dbContext.Add(new Exchange() { Name = "TradeSatoshi" });
+            }
+
             dbContext.SaveChanges();
         }
     }

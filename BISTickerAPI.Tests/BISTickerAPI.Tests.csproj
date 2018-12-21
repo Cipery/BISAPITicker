@@ -30,5 +30,6 @@
 	  <Copy SourceFiles="Json/market_btc.json" DestinationFolder="$(OutDir)" />
     <Copy SourceFiles="Json/market_usdt.json" DestinationFolder="$(OutDir)" />
 	  <Copy SourceFiles="Json/qtrade_tickers.json" DestinationFolder="$(OutDir)" />
+	  <Copy SourceFiles="Json/tradesatoshi.json" DestinationFolder="$(OutDir)" />
 	</Target>
 </Project>

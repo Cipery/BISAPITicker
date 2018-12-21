@@ -11,6 +11,7 @@ using System.IO;
 using BISTickerAPI.Entities;
 using BISTickerAPI.Helpers;
 using BISTickerAPI.Services.QTrade;
+using BISTickerAPI.Services.TradeSatoshi;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -110,6 +111,22 @@ namespace BISTickerAPI.Tests
             mockQTradeRestClient.Setup(call => call.RestClient).Returns(mockRestClient.Object);
             
             return new QTradeApi(mockQTradeRestClient.Object);
+        }
+
+        public static TradeSatoshiAPI MockTradeSatoshiApi()
+        {
+            var mockResponse = new Mock<IRestResponse>();
+            mockResponse.Setup(call => call.IsSuccessful).Returns(true);
+            mockResponse.Setup(call => call.Content).Returns(ReadFile("./tradesatoshi.json"));
+
+            var mockRestClient = new Mock<IRestClient>();
+            mockRestClient.Setup(call => call.Execute(It.IsAny<IRestRequest>()))
+                .Returns(mockResponse.Object);
+
+            var mockTradeSatoshiRestClient = new Mock<TradeSatoshiRestClient>();
+            mockTradeSatoshiRestClient.Setup(call => call.RestClient).Returns(mockRestClient.Object);
+
+            return new TradeSatoshiAPI(mockTradeSatoshiRestClient.Object);
         }
 
         #endregion
@@ -220,6 +237,63 @@ namespace BISTickerAPI.Tests
 
         #endregion
 
+        #region TradeSatoshi
+
+        [Fact]
+        public void TestFetchingFromTradeSatoshiFile()
+        {
+            var mockApi = MockTradeSatoshiApi();
+            var markets = mockApi.FetchMarkets();
+
+            Assert.True(markets.Any());
+            Assert.Contains(markets, p => p.Label == "BIS_BTC");
+        }
+
+        [Fact]
+        public void TestRealFetchingFromTradeSatoshi()
+        {
+            var api = new TradeSatoshiAPI(new TradeSatoshiRestClient());
+            var markets = api.FetchMarkets();
+
+            Assert.True(markets.Any());
+            Assert.Contains(markets, p => p.Label == "BIS_BTC");
+        }
+
+
+        [Theory]
+        [InlineData("BIS", "BTC")]
+        [InlineData("BTC", "USDT")]
+        [InlineData("ZEC", "BTC")]
+        [InlineData("ETH", "BTC")]
+        public void TestTradeSatoshiTickerServiceFileFetch(string coin1, string coin2)
+        {
+            using (var dbContext = CreateDbContext())
+            {
+                var mockApi = MockTradeSatoshiApi();
+                var tradeTickerService = new TradeSatoshiTickerService(dbContext, mockApi);
+                Assert.True(tradeTickerService.UpdateTicker(new[] { $"{coin1}/{coin2}" }));
+                Assert.True(dbContext.TickerEntries.Any());
+                Assert.True(dbContext.TickerEntries.Any(entry => entry.PairCoin1.Symbol.Equals(coin1)));
+            }
+        }
+
+        [Theory]
+        [InlineData("BIS", "BTC")]
+        public void TestTradeSatoshiTickerServiceRealFetch(string coin1, string coin2)
+        {
+            using (var dbContext = CreateDbContext())
+            {
+                var tradeSatoshiApi = new TradeSatoshiAPI(new TradeSatoshiRestClient());
+                var tradeSatoshiTickerService = new TradeSatoshiTickerService(dbContext, tradeSatoshiApi);
+                Assert.True(tradeSatoshiTickerService.UpdateTicker(new[] { $"{coin1}/{coin2}" }));
+                Assert.True(dbContext.TickerEntries.Any());
+                Assert.True(dbContext.TickerEntries.Any(entry => entry.PairCoin1.Symbol.Equals(coin1)));
+            }
+        }
+
+        #endregion
+
+
         #region Aggregator
 
         /// <summary>
@@ -232,7 +306,8 @@ namespace BISTickerAPI.Tests
             var dbContext = CreateDbContext();
             var cryptopiaTicker = new CryptopiaTickerService(dbContext, MockCryptopiaAPI());
             var qTradeTicker = new QTradeTickerService(dbContext, MockQTradeApi());
-            var aggregatorService = new AggregatorService(CreateDbContext(), MockAppSettings(), null, cryptopiaTicker, qTradeTicker);
+            var tradeSatoshiTicker = new TradeSatoshiTickerService(dbContext, MockTradeSatoshiApi());
+            var aggregatorService = new AggregatorService(CreateDbContext(), MockAppSettings(), null, cryptopiaTicker, qTradeTicker, tradeSatoshiTicker);
             var coins = dbContext.GetCoins("BIS", "BTC");
             Assert.NotNull(coins.Item1);
             Assert.NotNull(coins.Item2);
