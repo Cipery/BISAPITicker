@@ -7,6 +7,7 @@ using BISTickerAPI.Entities;
 using BISTickerAPI.Helpers;
 using BISTickerAPI.Model;
 using BISTickerAPI.Model.Exceptions;
+using BISTickerAPI.Services.TradeSatoshi;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,7 +25,8 @@ namespace BISTickerAPI.Services
         public AggregatorService(TickerDbContext dbContext, IOptions<AppSettings> settings,
                 ILogger<AggregatorService> logger,
                 CryptopiaTickerService cryptopiaTicker,
-                QTradeTickerService qTradeTicker)
+                QTradeTickerService qTradeTicker,
+                TradeSatoshiTickerService tradeSatoshiTicker)
         {
             this.DbContext = dbContext;
             this.Settings = settings.Value;
@@ -32,6 +34,7 @@ namespace BISTickerAPI.Services
 
             Tickers.Add(cryptopiaTicker);
             Tickers.Add(qTradeTicker);
+            Tickers.Add(tradeSatoshiTicker);
         }
 
         public void UpdateTickers()

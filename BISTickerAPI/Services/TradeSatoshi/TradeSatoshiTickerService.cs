@@ -5,26 +5,25 @@ using System.Threading.Tasks;
 using BISTickerAPI.Entities;
 using BISTickerAPI.Model;
 using BISTickerAPI.Model.POCO;
-using BISTickerAPI.Services.QTrade;
 
-namespace BISTickerAPI.Services
+namespace BISTickerAPI.Services.TradeSatoshi
 {
-    public class QTradeTickerService : ITicker
+    public class TradeSatoshiTickerService : ITicker
     {
-        protected TickerDbContext DbContext;
-        protected QTradeApi QTradeApi;
+        private readonly TradeSatoshiAPI _api;
+        private readonly TickerDbContext _dbContext;
 
-        public QTradeTickerService(TickerDbContext dbContext, QTradeApi qTradeApi)
+        public TradeSatoshiTickerService(TickerDbContext dbContext, TradeSatoshiAPI api)
         {
-            DbContext = dbContext;
-            QTradeApi = qTradeApi;
+            _api = api;
+            _dbContext = dbContext;
         }
 
         public bool UpdateTicker(string[] currencyPairs)
         {
-            var data = QTradeApi.FetchMarkets();
-            var exchange = DbContext.Exchanges.FirstOrDefault(e => e.Name.Equals(GetExchangeName()));
-            var coins = DbContext.Coins.ToList();
+            var data = _api.FetchMarkets();
+            var exchange = _dbContext.Exchanges.FirstOrDefault(e => e.Name.Equals(GetExchangeName()));
+            var coins = _dbContext.Coins.ToList();
 
             foreach (var pair in currencyPairs)
             {
@@ -37,24 +36,24 @@ namespace BISTickerAPI.Services
                 if (ticker == null)
                 {
 #if DEBUG
-                    Console.WriteLine($"QTrade ticker does not have pair {pair}.");
+                    Console.WriteLine($"TradeSatoshi ticker does not have pair {pair}.");
 #endif
                     continue;
                     //throw new Exception($"Ticker for pair {pair} got some issue!");
                 }
 
-                DbContext.Add(ticker);
+                _dbContext.Add(ticker);
             }
 
-            DbContext.SaveChanges();
+            _dbContext.SaveChanges();
 
             return true;
         }
 
-        protected TickerEntry CreateTickerEntry(List<QTradeTicker> tickers, Exchange exchange, Coin mainCoin, Coin baseCoin)
+        protected TickerEntry CreateTickerEntry(List<TradeSatoshiMarkets> tickers, Exchange exchange, Coin mainCoin, Coin baseCoin)
         {
             var tickerSymbol = $"{mainCoin.Symbol}_{baseCoin.Symbol}";
-            var ticker = tickers.Find(t => t.IdLabel.Equals(tickerSymbol));
+            var ticker = tickers.Find(t => t.Label.Equals(tickerSymbol));
             if (ticker == null)
             {
                 return null;
@@ -62,16 +61,16 @@ namespace BISTickerAPI.Services
 
             var tickerEntry = new TickerEntry()
             {
-                AskPrice = ticker.Ask ?? 0,
-                BidPrice = ticker.Bid ?? 0,
-                Change = ticker.DayChange,
-                High = ticker.DayHigh,
-                Low = ticker.DayLow,
-                Volume = ticker.DayVolumeMarket,
-                BaseVolume = ticker.DayVolumeBase,
-                Open = ticker.DayOpen,
+                AskPrice = ticker.Ask,
+                BidPrice = ticker.Bid,
+                Change = ticker.Change,
+                High = ticker.High,
+                Low = ticker.Low,
+                Volume = ticker.Volume,
+                BaseVolume = ticker.VolumeBase,
+                Open = null,
                 Label = mainCoin.Symbol,
-                LastPrice = ticker.Last ?? 0,
+                LastPrice = ticker.Last,
                 Timestamp = DateTime.UtcNow,
                 Exchange = exchange,
                 PairCoin1 = mainCoin,
@@ -83,7 +82,7 @@ namespace BISTickerAPI.Services
 
         public string GetExchangeName()
         {
-            return "QTrade";
+            return "TradeSatoshi";
         }
     }
 }

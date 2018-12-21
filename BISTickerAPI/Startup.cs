@@ -7,6 +7,7 @@ using BISTickerAPI.Helpers;
 using BISTickerAPI.Model;
 using BISTickerAPI.Services;
 using BISTickerAPI.Services.QTrade;
+using BISTickerAPI.Services.TradeSatoshi;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -52,10 +53,16 @@ namespace BISTickerAPI
             services.Configure<AppSettings>(Configuration);
             services.AddScoped<IRestClient>(s => new RestClient("https://www.cryptopia.co.nz/api"));
             services.AddScoped<ICryptopiaApi, CryptopiaAPI>();
+            services.AddScoped<CryptopiaTickerService>();
+
             services.AddScoped<QTradeApi>();
             services.AddSingleton<QTradeRestClient>();
             services.AddScoped<QTradeTickerService>();
-            services.AddScoped<CryptopiaTickerService>();
+
+            services.AddScoped<TradeSatoshiAPI>();
+            services.AddSingleton<TradeSatoshiRestClient>();
+            services.AddScoped<TradeSatoshiTickerService>();
+
             services.AddMemoryCache();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<AggregatorService>();
