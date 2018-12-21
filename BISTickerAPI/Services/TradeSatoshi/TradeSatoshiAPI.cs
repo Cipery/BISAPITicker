@@ -35,8 +35,6 @@ namespace BISTickerAPI.Services.TradeSatoshi
                 throw new Exception($"Request exception! Error message: {jObject}");
             }
 
-            var sadongaTanes = jObject["result"].Select(token => token.ToObject<TradeSatoshiMarkets>()).ToList();
-
             return jObject["result"].Select(token => token.ToObject<TradeSatoshiMarkets>()).ToList();
         }
     }
